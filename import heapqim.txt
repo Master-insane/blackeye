@@ -1,0 +1,54 @@
+import heapq
+import matplotlib.pyplot as plt
+import time
+import networkx as nx
+
+def ucs(G,start_node,goal_node):
+  visited = set()
+  q = [(0,start_node)]
+  order = []
+  while q:
+    cost,vertex = heapq.heappop(q)
+    if vertex not in visited:
+      visited.add(vertex)
+      order.append(vertex)
+      if vertex == goal_node and goal_node is not None:
+        return order
+      for node in G[vertex]:
+        edge_cost = G[vertex][node].get('weight',1)
+        heapq.heappush(q,(cost +edge_cost,node))
+
+  return order
+
+def visualize(G,pos,title,order,start_node,goal_node):
+  for current in order:
+    plt.clf()
+    plt.title('UCS')
+    node_color = []
+    for node in G.nodes():
+      if node == current:
+        node_color.append('r')
+      elif node == start_node:
+        node_color.append('y')
+      elif node == goal_node:
+        node_color.append('b')
+      else:
+        node_color.append('g')
+    nx.draw(G,pos,with_labels = True,node_color = node_color)
+    plt.draw()
+    plt.pause(1.5)
+    plt.show()
+
+
+G = nx.Graph()
+G.add_edge('A','B',weight=1)
+G.add_edge('A','C',weight=4)
+G.add_edge('B','D',weight=2)
+G.add_edge('B','E',weight=5)
+G.add_edge('C','F',weight=3)
+G.add_edge('C','G',weight=6)
+
+pos = nx.spring_layout(G)
+order = ucs(G, 'A', 'F')
+visualize(G, pos, "UCS Traversal (A to F)", order, 'A', 'F')
+print(ucs(G,'A','F'))

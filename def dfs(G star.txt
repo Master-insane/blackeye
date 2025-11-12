@@ -1,0 +1,51 @@
+def dfs(G, start_node, goal_node=None):
+    visited = set()
+    stack = [start_node]
+    order = []
+
+    while stack:
+        vertex = stack.pop()
+        if vertex not in visited:
+            visited.add(vertex)
+            order.append(vertex)
+
+            # Stop if goal found
+            if goal_node is not None and vertex == goal_node:
+                return order
+
+            # Push neighbors in reverse to maintain natural order
+            for neighbor in reversed(list(G[vertex])):
+                if neighbor not in visited:
+                    stack.append(neighbor)
+    return order
+
+
+def visualize_dfs(G,pos,title,order,start_node,goal_node):
+  for current in order:
+    plt.clf()
+    plt.title("BFS")
+    node_colors = []
+    for node in G.nodes():
+            if node == current:
+                 node_colors.append('red')  # current exploring node
+            elif node == start_node:
+                 node_colors.append('blue')  # start
+            elif node == goal_node:
+                 node_colors.append('yellow')  # goal
+            else:
+                 node_colors.append('green')  # others
+
+    nx.draw(G,pos,with_labels = True,node_color = node_colors)
+    plt.draw()
+    plt.pause(1.5)
+  plt.show()
+
+
+G = nx.Graph()
+G.add_edges_from([
+     ('A','B'), ('A','C'),
+     ('B','D'), ('B','E'),
+     ('C','F'), ('C','G') ])
+pos = nx.spring_layout(G)
+order = dfs(G,start_node = 'A',goal_node = 'F')
+visualize_dfs(G,pos = pos,title = 'BFS',order = order,start_node = 'A',goal_node = 'F')
